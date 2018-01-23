@@ -54,6 +54,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import com.codahale.metrics.Timer;
 import org.apache.avro.ipc.CallFuture;
 import org.apache.avro.ipc.NettyTransceiver;
 import org.apache.avro.ipc.Transceiver;
@@ -105,11 +106,17 @@ public class NettyAvroRpcClient extends AbstractRpcClient implements RpcClient {
   private int compressionLevel;
   private int maxIoWorkers;
 
+  private Timer timer;
+
   /**
    * This constructor is intended to be called from {@link RpcClientFactory}.
    * A call to this constructor should be followed by call to configure().
    */
   protected NettyAvroRpcClient(){
+  }
+
+  protected NettyAvroRpcClient(Timer timer){
+    this.timer = timer;
   }
 
   /**
@@ -268,7 +275,14 @@ public class NettyAvroRpcClient extends AbstractRpcClient implements RpcClient {
 
         @Override
         public Void call() throws Exception {
-          avroClient.append(avroEvent, callFuture);
+            Timer.Context timerContext = null;
+            if (timer != null) {
+              timerContext = timer.time();
+            }
+            avroClient.append(avroEvent, callFuture);
+            if (timerContext != null) {
+              timerContext.stop();
+            }
           return null;
         }
       });
@@ -344,7 +358,14 @@ public class NettyAvroRpcClient extends AbstractRpcClient implements RpcClient {
 
           @Override
           public Void call() throws Exception {
+            Timer.Context timerContext = null;
+            if (timer != null) {
+              timerContext = timer.time();
+            }
             avroClient.appendBatch(avroEvents, callFuture);
+            if (timerContext != null) {
+              timerContext.stop();
+            }
             return null;
           }
         });

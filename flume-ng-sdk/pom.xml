@@ -21,7 +21,7 @@ limitations under the License.
   <parent>
     <artifactId>flume-parent</artifactId>
     <groupId>org.apache.flume</groupId>
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.8.1</version>
   </parent>
 
   <artifactId>flume-ng-sdk</artifactId>
@@ -244,6 +244,12 @@ limitations under the License.
     <dependency>
       <groupId>org.apache.thrift</groupId>
       <artifactId>libthrift</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>3.2.5</version>
     </dependency>
 
   </dependencies>

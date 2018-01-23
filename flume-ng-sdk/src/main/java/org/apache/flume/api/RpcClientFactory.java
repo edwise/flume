@@ -18,6 +18,7 @@
  */
 package org.apache.flume.api;
 
+import com.codahale.metrics.Timer;
 import org.apache.flume.FlumeException;
 
 import java.io.File;
@@ -168,6 +169,29 @@ public class RpcClientFactory {
         hostname + ":" + port.intValue());
     props.setProperty(RpcClientConfigurationConstants.CONFIG_BATCH_SIZE, batchSize.toString());
     NettyAvroRpcClient client = new NettyAvroRpcClient();
+    client.configure(props);
+    return client;
+  }
+
+  public static RpcClient getDefaultInstance(String hostname, Integer port,
+                                             Integer batchSize, Timer timer) throws FlumeException {
+
+    if (hostname == null) {
+      throw new NullPointerException("hostname must not be null");
+    }
+    if (port == null) {
+      throw new NullPointerException("port must not be null");
+    }
+    if (batchSize == null) {
+      throw new NullPointerException("batchSize must not be null");
+    }
+
+    Properties props = new Properties();
+    props.setProperty(RpcClientConfigurationConstants.CONFIG_HOSTS, "h1");
+    props.setProperty(RpcClientConfigurationConstants.CONFIG_HOSTS_PREFIX + "h1",
+                      hostname + ":" + port.intValue());
+    props.setProperty(RpcClientConfigurationConstants.CONFIG_BATCH_SIZE, batchSize.toString());
+    NettyAvroRpcClient client = new NettyAvroRpcClient(timer);
     client.configure(props);
     return client;
   }
